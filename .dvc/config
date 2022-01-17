@@ -1,0 +1,2 @@
+['remote "s3remote"']
+    url = s3://cristian-udacity-mlops-p3/dvc_folder/
