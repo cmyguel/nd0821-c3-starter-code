@@ -2,7 +2,7 @@
 
 ## Model Details
 - Person developing the model: Cristian Del Toro, in the context of Udacity Course: "Machine Learning DevOps Engineer Nanodegree Program".
-- Date: 02/2022
+- Date: 01/2022
 - Model type: Random Forest Classifier.
 
 ## Intended Use
