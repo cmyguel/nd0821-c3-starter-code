@@ -3,12 +3,12 @@ import numpy as np
 import pandas as pd
 import sklearn as sk
 from pathlib import Path
-from starter.starter.ml.data import process_data
-from starter.starter.ml.model import train_model, inference, compute_model_metrics
+from ..starter.ml.data import process_data
+from ..starter.ml.model import train_model, inference, compute_model_metrics
 
 @pytest.fixture(scope="session")
 def data():
-    FOLDER_DATA = Path("starter/data")
+    FOLDER_DATA = Path("data")
     data = pd.read_csv( FOLDER_DATA/"census_clean.csv", low_memory=False)
     return data
 
