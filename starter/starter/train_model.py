@@ -10,8 +10,8 @@ from ml.model import train_model, compute_model_metrics, inference
 import pandas as pd
 import pickle
 
-FOLDER_DATA = Path("starter/data")
-FOLDER_MODEL = Path("starter/model")
+FOLDER_DATA = Path("data")
+FOLDER_MODEL = Path("model")
 # Add code to load in the data.
 
 data = pd.read_csv( FOLDER_DATA/"census_clean.csv", low_memory=False)
