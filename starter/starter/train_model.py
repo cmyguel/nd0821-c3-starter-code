@@ -47,12 +47,10 @@ X_test, y_test, encoder, lb = process_data(
 # Train and save a model.
 
 clf = train_model(X_train, y_train)
-
 with open( FOLDER_MODEL/'model_encoder_lb_catfeatures.pkl', 'wb') as f:
     pickle.dump((clf, encoder, lb, cat_features), f)
 
 # Load and test model 
-
 with open( FOLDER_MODEL/'model_encoder_lb_catfeatures.pkl', 'rb') as f:
     (clf, encoder, lb, cat_features) = pickle.load(f)
 
@@ -96,5 +94,5 @@ def slice_metrics(df, feature):
         print(f"metrics: {metrics}")
     print()
 
-# for feature in cat_features:
-#     slice_metrics(test, feature)
+for feature in cat_features:
+    slice_metrics(test, feature)
