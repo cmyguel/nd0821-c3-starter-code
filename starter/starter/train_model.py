@@ -56,4 +56,35 @@ with open( FOLDER_MODEL/'model.pkl', 'rb') as f:
     clf = pickle.load(f)
 
 preds = inference(clf, X_test)
-print(compute_model_metrics(y_test, preds))
+print(f"General performance: {compute_model_metrics(y_test, preds)} \n")
+
+
+# Performance in Slices
+
+def slice_metrics(df, feature):
+    """ 
+        Function for calculating the performance of the model on slices of the data.
+        Only for categorical features
+    """
+    print(f"------------ feature: {feature} ------------")
+    for cls in df[feature].unique():
+        df_temp = df[df[feature] == cls]
+
+        X_test_temp, y_test_temp, _, _ = process_data(
+            df_temp,
+            categorical_features=cat_features, 
+            label="salary", 
+            training=False, 
+            encoder=encoder, 
+            lb=lb, 
+            )
+
+        preds = inference(clf, X_test_temp)
+        metrics = compute_model_metrics(y_test_temp, preds)
+
+        print(f"feature: {feature}, value: {cls}")
+        print(f"metrics: {metrics}")
+    print()
+
+for feature in cat_features:
+    slice_metrics(test, feature)
