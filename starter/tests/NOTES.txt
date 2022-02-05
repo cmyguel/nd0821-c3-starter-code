@@ -1,0 +1,2 @@
+- run from first /starter folder
+- for test_local_api, run api with: uvicorn main:app --reload
