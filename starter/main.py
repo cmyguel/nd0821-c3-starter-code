@@ -35,7 +35,7 @@ class RequestModel(BaseModel):
     hours_per_week: Union[int, Dict[str, int]] = Field(alias='hours-per-week')
     native_country: Union[str, Dict[str, str]] = Field(alias='native-country')
 
-@app.post('/')
+@app.post('/predict')
 async def predict(request: RequestModel):
     
     input_data = request.dict()

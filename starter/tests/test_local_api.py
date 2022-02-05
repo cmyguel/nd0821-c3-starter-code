@@ -43,7 +43,7 @@ def test_say_hello():
 
 def test_predict_status(data):
     data_dict = data.to_json()
-    r = requests.post("http://127.0.0.1:8000/", data_dict)
+    r = requests.post("http://127.0.0.1:8000/predict", data_dict)
     assert r.status_code == 200
 
 def test_predict_output(data, processed_data, model_data):
@@ -52,6 +52,6 @@ def test_predict_output(data, processed_data, model_data):
     preds = inference(clf, X).tolist()
 
     data_dict = data.to_json()
-    r = requests.post("http://127.0.0.1:8000/", data_dict)
+    r = requests.post("http://127.0.0.1:8000/predict", data_dict)
     preds2 = r.json()['prediction']
     assert preds.__str__() == preds2.__str__()
