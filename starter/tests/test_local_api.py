@@ -14,18 +14,25 @@ def data():
     return data
 
 @pytest.fixture(scope="session")
-def model_data():
+def model():
     FOLDER_MODEL = Path("model")
-    with open( FOLDER_MODEL/'model_encoder_lb_catfeatures.pkl', 'rb') as f:
-        (clf, encoder, lb, cat_features) = pickle.load(f)
-    return (clf, encoder, lb, cat_features)
+    with open( FOLDER_MODEL/'model.pkl', 'rb') as f:
+        clf = pickle.load(f)
+    return clf
 
 @pytest.fixture(scope="session")
-def processed_data(data, model_data):
+def encoder_data():
+    FOLDER_MODEL = Path("model")
+    with open( FOLDER_MODEL/'onehot_encoder.pkl', 'rb') as f:
+        (encoder, lb, cat_features) = pickle.load(f)
+    return (encoder, lb, cat_features)
+
+@pytest.fixture(scope="session")
+def processed_data(data, encoder_data):
     """
         returns (X, y, encoder, lb)
     """
-    (clf, encoder, lb, cat_features) = model_data
+    (encoder, lb, cat_features) = encoder_data
     (X, y, encoder, lb) = process_data(
         data,
         categorical_features=cat_features, 
@@ -46,9 +53,10 @@ def test_predict_status(data):
     r = requests.post("http://127.0.0.1:8000/predict", data_dict)
     assert r.status_code == 200
 
-def test_predict_output(data, processed_data, model_data):
+def test_predict_output(data, processed_data, model, encoder_data):
     (X, y, _, _) = processed_data
-    (clf, encoder, lb, cat_features) = model_data
+    clf = model
+    (encoder, lb, cat_features) = encoder_data
     preds = inference(clf, X).tolist()
 
     data_dict = data.to_json()
