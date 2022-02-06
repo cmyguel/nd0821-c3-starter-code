@@ -1,14 +1,13 @@
 # Script to train machine learning model.
 
-from sklearn.model_selection import train_test_split
-
 # Add the necessary imports for the starter code.
-
 from pathlib import Path
-from ml.data import process_data
-from ml.model import train_model, compute_model_metrics, inference
 import pandas as pd
 import pickle
+from sklearn.model_selection import train_test_split
+from ml.data import process_data
+from ml.model import train_model, compute_model_metrics, inference
+from ml.model import Inference_artifact
 
 FOLDER_DATA = Path("data")
 FOLDER_MODEL = Path("model")
@@ -34,7 +33,6 @@ X_train, y_train, encoder, lb = process_data(
 )
 
 # Proces the test data with the process_data function.
-
 X_test, y_test, encoder, lb = process_data(
     test,
     categorical_features=cat_features, 
@@ -45,30 +43,26 @@ X_test, y_test, encoder, lb = process_data(
 )
 
 # Train and save a model.
-
 clf = train_model(X_train, y_train)
-with open( FOLDER_MODEL/'model_encoder_lb_catfeatures.pkl', 'wb') as f:
-    pickle.dump((clf, encoder, lb, cat_features), f)
+with open( FOLDER_MODEL/'model.pkl', 'wb') as f:
+    pickle.dump(clf, f)
+
+# save encoder data
+with open( FOLDER_MODEL/'onehot_encoder.pkl', 'wb') as f:
+    pickle.dump((encoder, lb, cat_features), f)
 
 # Load and test model 
-with open( FOLDER_MODEL/'model_encoder_lb_catfeatures.pkl', 'rb') as f:
-    (clf, encoder, lb, cat_features) = pickle.load(f)
+inference_artifact = Inference_artifact( 
+                                        FOLDER_MODEL/'model.pkl',
+                                        FOLDER_MODEL/'onehot_encoder.pkl',
+                                         )
 
-X_test, y_test, encoder, lb = process_data(
-    test,
-    categorical_features=cat_features, 
-    label="salary", 
-    training=False, 
-    encoder=encoder, 
-    lb=lb, 
-)
 
-preds = inference(clf, X_test)
+preds = inference_artifact.predict(test)
+print("Metrics: (precision, recall, fbeta)")
 print(f"General performance: {compute_model_metrics(y_test, preds)} \n")
 
-
 # Performance in Slices
-
 def slice_metrics(df, feature):
     """ 
         Function for calculating the performance of the model on slices of the data.
@@ -78,16 +72,8 @@ def slice_metrics(df, feature):
     for cls in df[feature].unique():
         df_temp = df[df[feature] == cls]
 
-        X_test_temp, y_test_temp, _, _ = process_data(
-            df_temp,
-            categorical_features=cat_features, 
-            label="salary", 
-            training=False, 
-            encoder=encoder, 
-            lb=lb, 
-            )
-
-        preds = inference(clf, X_test_temp)
+        _,y_test_temp,_,_ = inference_artifact.onehot_encoder.process_data(df_temp, 'salary')
+        preds = inference_artifact.predict(df_temp)
         metrics = compute_model_metrics(y_test_temp, preds)
 
         print(f"feature: {feature}, value: {cls}")

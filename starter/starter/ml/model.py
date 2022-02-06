@@ -64,22 +64,34 @@ def inference(model, X):
     """
     return model.predict(X)
 
-class Inference_artifact:
-    def __init__(self, model_path: Path):
-        with open( model_path, 'rb') as f:
-            (self.clf, self.encoder, self.lb, self.cat_features) = pickle.load(f)
+class Onehot_encoder:
+    def __init__(self, encoder_path: Path):
+        with open( encoder_path, 'rb') as f:
+            (self.encoder, self.lb, self.cat_features) = pickle.load(f)
     
-    def predict(self, data: pd.DataFrame):
-        if 'salary' in data:
-            data = data.copy()
-            data.pop('salary')
-        X, _, _, _ = process_data(
+    def process_data(self, data: pd.DataFrame, label=None):
+        X, y, encoder, lb = process_data(
             data,
             categorical_features=self.cat_features, 
-            label=None, 
+            label=label, 
             training=False, 
             encoder=self.encoder, 
             lb=self.lb, 
         )
+        return X, y, encoder, lb
+
+
+class Inference_artifact:
+    def __init__(self, model_path:Path, encoder_path:Path):
+        with open( model_path, 'rb') as f:
+            self.clf = pickle.load(f)
+        self.onehot_encoder = Onehot_encoder(encoder_path)        
+
+    def predict(self, data: pd.DataFrame):
+        if 'salary' in data:
+            data = data.copy()
+            data.pop('salary')
+
+        X,_,_,_ = self.onehot_encoder.process_data(data)
         pred = inference(self.clf, X)
         return pred
