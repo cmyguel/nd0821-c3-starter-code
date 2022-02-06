@@ -1,0 +1,4 @@
+outs:
+- md5: d20738aa684806f3ecae3cb7f8c3516e
+  size: 2186
+  path: onehot_encoder.pkl
