@@ -58,17 +58,13 @@ inference_artifact = Inference_artifact(
                                          )
 
 
-preds = inference_artifact.predict(test)
-print("Metrics: (precision, recall, fbeta)")
-print(f"General performance: {compute_model_metrics(y_test, preds)} \n")
-
 # Performance in Slices
-def slice_metrics(df, feature):
+def slice_metrics(df, feature, file=None):
     """ 
         Function for calculating the performance of the model on slices of the data.
         Only for categorical features
     """
-    print(f"------------ feature: {feature} ------------")
+    print(f"------------ feature: {feature} ------------", file=file)
     for cls in df[feature].unique():
         df_temp = df[df[feature] == cls]
 
@@ -76,9 +72,17 @@ def slice_metrics(df, feature):
         preds = inference_artifact.predict(df_temp)
         metrics = compute_model_metrics(y_test_temp, preds)
 
-        print(f"feature: {feature}, value: {cls}")
-        print(f"metrics: {metrics}")
-    print()
+        print(f"feature: {feature}, value: {cls}", file=file)
+        print(f"metrics: {metrics}", file=file)
+    print(file=file)
 
-for feature in cat_features:
-    slice_metrics(test, feature)
+
+preds = inference_artifact.predict(test)
+
+SLICE_OUTPUT_FILE = Path("tests/slice_output.txt")
+SLICE_OUTPUT_FILE.unlink(missing_ok=True) # deletes file if exists
+with open(SLICE_OUTPUT_FILE, 'a') as f:
+    print("Metrics: (precision, recall, fbeta)", file=f)
+    print(f"General performance: {compute_model_metrics(y_test, preds)} \n", file=f)
+    for feature in cat_features:
+        slice_metrics(test, feature, f)
