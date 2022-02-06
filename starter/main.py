@@ -1,7 +1,7 @@
 # Put the code for your API here.
 import pandas as pd
 from fastapi import FastAPI
-from typing import Union, Dict
+from typing import Union, Dict, Optional
 from pydantic import BaseModel, Field
 from pathlib import Path
 
@@ -10,8 +10,11 @@ from starter.ml.model import Inference_artifact
 # instantiate the app
 app = FastAPI()
 # instantiate inference artifact
-MODEL_PATH = Path("model/model_encoder_lb_catfeatures.pkl")
-inference = Inference_artifact(MODEL_PATH) 
+FOLDER_MODEL = Path("model")
+inference = Inference_artifact(
+                                FOLDER_MODEL/'model.pkl',
+                                FOLDER_MODEL/'onehot_encoder.pkl',
+                                ) 
 
 # GET welcome message
 @app.get('/')
@@ -27,7 +30,7 @@ class RequestModel(BaseModel):
     relationship:   Union[str, Dict[str, str]]
     race:           Union[str, Dict[str, str]]
     sex:            Union[str, Dict[str, str]]
-    salary:         Union[str, Dict[str, str]]
+    salary:         Optional[Union[str, Dict[str, str]]]
     education_num:  Union[int, Dict[str, int]] = Field(alias='education-num')
     marital_status: Union[str, Dict[str, str]] = Field(alias='marital-status')
     capital_gain:   Union[int, Dict[str, int]] = Field(alias='capital-gain')
