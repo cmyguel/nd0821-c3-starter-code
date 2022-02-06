@@ -49,7 +49,12 @@ async def predict(request: RequestModel):
         if "_" in k:
             input_data[k.replace('_', '-')] = input_data.pop(k)
 
-    input_df = pd.DataFrame(input_data)
+    # Check if input dictionary included DataFrame indexes
+    if isinstance(input_data['age'], dict):
+        input_df = pd.DataFrame(input_data)
+    else: 
+        input_df = pd.DataFrame(input_data, index=[0])
+
     if 'salary' in input_df:
         input_df.pop('salary')
     
