@@ -79,7 +79,7 @@ def slice_metrics(df, feature, file=None):
 
 preds = inference_artifact.predict(test)
 
-SLICE_OUTPUT_FILE = Path("tests/slice_output.txt")
+SLICE_OUTPUT_FILE = Path("starter/slice_output.txt")
 SLICE_OUTPUT_FILE.unlink(missing_ok=True) # deletes file if exists
 with open(SLICE_OUTPUT_FILE, 'a') as f:
     print("Metrics: (precision, recall, fbeta)", file=f)
