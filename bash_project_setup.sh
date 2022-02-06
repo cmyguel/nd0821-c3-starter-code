@@ -1,2 +1,2 @@
-conda install --file starter/requirements.txt -c conda-forge
+conda install --file requirements.txt -c conda-forge
 dvc pull
