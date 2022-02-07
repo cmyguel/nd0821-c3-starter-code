@@ -3,8 +3,8 @@ import requests
 import pandas as pd
 import pickle
 from pathlib import Path
-from ..starter.ml.data import process_data
-from ..starter.ml.model import inference
+from starter.ml.data import process_data
+from starter.ml.model import inference
 
 
 @pytest.fixture(scope="session")
