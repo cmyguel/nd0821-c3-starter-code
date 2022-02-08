@@ -3,9 +3,13 @@ import requests
 import pandas as pd
 import pickle
 from pathlib import Path
+from fastapi.testclient import TestClient
+from main import app
+
 from starter.ml.data import process_data
 from starter.ml.model import inference
 
+home = TestClient(app)
 
 @pytest.fixture(scope="session")
 def data():
@@ -44,7 +48,7 @@ def processed_data(data, encoder_data):
     return (X, y, encoder, lb)
 
 def test_say_hello():
-    r = requests.get("http://127.0.0.1:8000/", timeout=1)
+    r = home.get("/")
     assert r.status_code == 200
     assert "greetings" in r.json()
 
@@ -60,7 +64,7 @@ def test_predict_positive(data, processed_data, model, encoder_data):
     print("data_dict:", data_dict)
 
     preds = inference(clf, Xi).tolist()
-    r = requests.post("http://127.0.0.1:8000/predict", data_dict)
+    r = home.post("/predict", data_dict)
     preds2 = r.json()['prediction']
     assert r.status_code == 200
     assert preds.__str__() == preds2.__str__()
@@ -77,7 +81,7 @@ def test_predict_negative(data, processed_data, model, encoder_data):
     print("data_dict:", data_dict)
 
     preds = inference(clf, Xi).tolist()
-    r = requests.post("http://127.0.0.1:8000/predict", data_dict)
+    r = home.post("/predict", data_dict)
     preds2 = r.json()['prediction']
     assert r.status_code == 200
     assert preds.__str__() == preds2.__str__()
@@ -89,7 +93,7 @@ def test_predict_alldata(data, processed_data, model, encoder_data):
     preds = inference(clf, X).tolist()
 
     data_dict = data.to_json()
-    r = requests.post("http://127.0.0.1:8000/predict", data_dict)
+    r = home.post("/predict", data_dict)
     preds2 = r.json()['prediction']
     assert r.status_code == 200
     assert preds.__str__() == preds2.__str__()
