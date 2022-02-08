@@ -56,15 +56,15 @@ def test_predict_positive(data, processed_data, model, encoder_data):
     (X, y, _, _) = processed_data
     clf = model
     (encoder, lb, cat_features) = encoder_data
-
+    
     Xi = X[data['salary']=='>50K'][[0]]
-    data_dict = data[data['salary']=='>50K'].head(1).to_json()
+    data_json = data[data['salary']=='>50K'].head(1).to_json()
 
     print("Xi:", Xi)
-    print("data_dict:", data_dict)
+    print("data_json:", data_json)
 
     preds = inference(clf, Xi).tolist()
-    r = home.post("/predict", data_dict)
+    r = home.post("/predict", data_json)
     preds2 = r.json()['prediction']
     assert r.status_code == 200
     assert preds.__str__() == preds2.__str__()
@@ -75,13 +75,13 @@ def test_predict_negative(data, processed_data, model, encoder_data):
     (encoder, lb, cat_features) = encoder_data
 
     Xi = X[data['salary']=='<=50K'][[0]]
-    data_dict = data[data['salary']=='<=50K'].head(1).to_json()
+    data_json = data[data['salary']=='<=50K'].head(1).to_json()
 
     print("Xi:", Xi)
-    print("data_dict:", data_dict)
+    print("data_json:", data_json)
 
     preds = inference(clf, Xi).tolist()
-    r = home.post("/predict", data_dict)
+    r = home.post("/predict", data_json)
     preds2 = r.json()['prediction']
     assert r.status_code == 200
     assert preds.__str__() == preds2.__str__()
@@ -92,8 +92,8 @@ def test_predict_alldata(data, processed_data, model, encoder_data):
     (encoder, lb, cat_features) = encoder_data
     preds = inference(clf, X).tolist()
 
-    data_dict = data.to_json()
-    r = home.post("/predict", data_dict)
+    data_json = data.to_json()
+    r = home.post("/predict", data_json)
     preds2 = r.json()['prediction']
     assert r.status_code == 200
     assert preds.__str__() == preds2.__str__()
