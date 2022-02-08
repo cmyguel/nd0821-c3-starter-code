@@ -35,16 +35,29 @@ jobs:
       run: |
         dvc pull
 
+    - name: See conda env path
+      run: conda env list
+
+    - name: Set cache date
+      run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+
+    # cache environment
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: $pip-{{ hashFiles('requirements_cicd.txt') }}-${{ env.DATE }}-${{ env.CACHE_NUMBER }}
+      id: cache_pip
+
     - name: Install dependencies
       run: |
         echo "Upgrading pip"
         python -m pip install --upgrade pip
         echo "Installing flake8, pytest"
         pip install flake8 pytest
-        echo "conda installing requirements.txt"
-        $CONDA/bin/conda install --file requirements.txt -c conda-forge
-        echo "pip installing gunicorn"
-        pip install gunicorn
+        # echo "conda installing requirements.txt"
+        # $CONDA/bin/conda install --file requirements.txt -c conda-forge
+        echo "Install requirements_cicd.txt"
+        pip install -r requirements_cicd.txt
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
