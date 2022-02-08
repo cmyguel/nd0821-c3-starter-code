@@ -48,12 +48,41 @@ def test_say_hello():
     assert r.status_code == 200
     assert "greetings" in r.json()
 
-def test_predict_status(data):
-    data_dict = data.to_json()
-    r = requests.post("http://127.0.0.1:8000/predict", data_dict)
-    assert r.status_code == 200
+def test_predict_positive(data, processed_data, model, encoder_data):
+    (X, y, _, _) = processed_data
+    clf = model
+    (encoder, lb, cat_features) = encoder_data
 
-def test_predict_output(data, processed_data, model, encoder_data):
+    Xi = X[data['salary']=='>50K'][[0]]
+    data_dict = data[data['salary']=='>50K'].head(1).to_json()
+
+    print("Xi:", Xi)
+    print("data_dict:", data_dict)
+
+    preds = inference(clf, Xi).tolist()
+    r = requests.post("http://127.0.0.1:8000/predict", data_dict)
+    preds2 = r.json()['prediction']
+    assert r.status_code == 200
+    assert preds.__str__() == preds2.__str__()
+
+def test_predict_negative(data, processed_data, model, encoder_data):
+    (X, y, _, _) = processed_data
+    clf = model
+    (encoder, lb, cat_features) = encoder_data
+
+    Xi = X[data['salary']=='<=50K'][[0]]
+    data_dict = data[data['salary']=='<=50K'].head(1).to_json()
+
+    print("Xi:", Xi)
+    print("data_dict:", data_dict)
+
+    preds = inference(clf, Xi).tolist()
+    r = requests.post("http://127.0.0.1:8000/predict", data_dict)
+    preds2 = r.json()['prediction']
+    assert r.status_code == 200
+    assert preds.__str__() == preds2.__str__()
+
+def test_predict_alldata(data, processed_data, model, encoder_data):
     (X, y, _, _) = processed_data
     clf = model
     (encoder, lb, cat_features) = encoder_data
@@ -62,4 +91,5 @@ def test_predict_output(data, processed_data, model, encoder_data):
     data_dict = data.to_json()
     r = requests.post("http://127.0.0.1:8000/predict", data_dict)
     preds2 = r.json()['prediction']
+    assert r.status_code == 200
     assert preds.__str__() == preds2.__str__()
