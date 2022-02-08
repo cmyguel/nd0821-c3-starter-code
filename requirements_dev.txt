@@ -1,4 +1,4 @@
-## python==3.8
+python==3.8
 numpy
 pandas
 scikit-learn
@@ -7,5 +7,5 @@ flake8
 requests
 fastapi==0.63.0
 uvicorn
-# dvc
-# dvc-s3
+dvc
+dvc-s3

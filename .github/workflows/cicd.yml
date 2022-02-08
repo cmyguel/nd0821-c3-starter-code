@@ -6,7 +6,7 @@ name: CICD
 on:
   # run manually
   workflow_dispatch:
-  #push:
+  push:
     branches: [ master ]
     
 jobs:

@@ -4,12 +4,24 @@ from fastapi import FastAPI
 from typing import Union, Dict, Optional
 from pydantic import BaseModel, Field
 from pathlib import Path
-from starter.ml.model import Inference_artifact
+import os
+
+if "DYNO" in os.environ and os.path.isdir(".dvc"):
+    # Heroku runs app from main project folder
+    from starter.starter.ml.model import Inference_artifact
+    FOLDER_MODEL = Path("starter/model")
+
+    os.system("dvc config core.no_scm true")
+    if os.system("dvc pull") != 0:
+        exit("dvc pull failed")
+    os.system("rm -r .dvc .apt/usr/lib/dvc")
+else:
+    from starter.ml.model import Inference_artifact
+    FOLDER_MODEL = Path("model")
 
 # instantiate the app
 app = FastAPI()
 # instantiate inference artifact
-FOLDER_MODEL = Path("model")
 inference = Inference_artifact(
                                 FOLDER_MODEL/'model.pkl',
                                 FOLDER_MODEL/'onehot_encoder.pkl',
