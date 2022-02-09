@@ -52,39 +52,39 @@ def test_say_hello():
     assert r.status_code == 200
     assert "greetings" in r.json()
 
-def test_predict_positive(data, processed_data, model, encoder_data):
-    (X, y, _, _) = processed_data
-    clf = model
-    (encoder, lb, cat_features) = encoder_data
-    
-    Xi = X[data['salary']=='>50K'][[0]]
-    data_json = data[data['salary']=='>50K'].head(1).to_json()
-
-    print("Xi:", Xi)
-    print("data_json:", data_json)
-
+def test_predict_positive(data, processed_data, model):
+    (X, _, _, _) = processed_data
+    clf = model    
+    # Get 10 rows with positive label
+    Xi = X[data['salary']=='>50K'][:10]
+    # Model prediction for 10 values
     preds = inference(clf, Xi).tolist()
+    #Find index of positive prediction 
+    # note: (not all rows with positive label will get a positive prediction)
+    idx = preds.index(1)
+    # Select index row from dataframe
+    data_json = data[data['salary']=='>50K'].head(10).iloc[idx].to_json()
+    # Api prediction
     r = home.post("/predict", data_json)
-    preds2 = r.json()['prediction']
     assert r.status_code == 200
-    assert preds.__str__() == preds2.__str__()
+    assert r.json()['prediction']==[1]
 
 def test_predict_negative(data, processed_data, model, encoder_data):
-    (X, y, _, _) = processed_data
-    clf = model
-    (encoder, lb, cat_features) = encoder_data
-
-    Xi = X[data['salary']=='<=50K'][[0]]
-    data_json = data[data['salary']=='<=50K'].head(1).to_json()
-
-    print("Xi:", Xi)
-    print("data_json:", data_json)
-
+    (X, _, _, _) = processed_data
+    clf = model    
+    # Get 10 rows with negative label
+    Xi = X[data['salary']=='<=50K'][:10]
+    # Model prediction for 10 values
     preds = inference(clf, Xi).tolist()
+    #Find index of negative prediction 
+    # note: (not all rows with negative label will get a negative prediction)
+    idx = preds.index(0)
+    # Select index row from dataframe
+    data_json = data[data['salary']=='<=50K'].head(10).iloc[idx].to_json()
+    # Api prediction
     r = home.post("/predict", data_json)
-    preds2 = r.json()['prediction']
     assert r.status_code == 200
-    assert preds.__str__() == preds2.__str__()
+    assert r.json()['prediction']==[0]
 
 def test_predict_alldata(data, processed_data, model, encoder_data):
     (X, y, _, _) = processed_data
